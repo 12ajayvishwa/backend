@@ -65,7 +65,7 @@ app.delete("/product/:id", async (req, resp) => {
 
 app.get("/product/:id", async (req, resp) => {
     try {
-        const info = await Product.findById({_id:req.params?.id});
+        const info = await Product.findById({ _id: req.params?.id });
         if (info) {
             return resp.status(200).json(prepareResult(false, info));
         }
@@ -75,6 +75,15 @@ app.get("/product/:id", async (req, resp) => {
         return resp.status(500).json(prepareResult(false, error.message));
     }
 });
+
+app.put("/product/:id", async (req, resp) => {
+    try {
+        let result = await Product.updateOne({ _id: req.params.id })
+        resp.send(result)
+    } catch (e) {
+        console.log(e)
+    }
+})
 
 app.listen(5000);
 
