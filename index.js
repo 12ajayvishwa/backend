@@ -112,7 +112,6 @@ app.get("/search/:key", async (req, resp) => {
         ]
     });
     resp.send(result);
-})
+});
 
-app.listen(5000);
 
