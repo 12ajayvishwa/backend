@@ -78,7 +78,9 @@ app.get("/product/:id", async (req, resp) => {
 
 app.put("/product/:id", async (req, resp) => {
     try {
-        let result = await Product.updateOne({ _id: req.params.id })
+        let result = await Product.updateOne({ _id: req.params.id }, {
+            $set: req.body
+        })
         resp.send(result)
     } catch (e) {
         console.log(e)
