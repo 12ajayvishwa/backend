@@ -5,6 +5,9 @@ const User = require("./db/User");
 const Product = require("./db/Product")
 const app = express();
 
+const Jwt = require('jsonwebtoken');
+const jwtKey = 'e-comm';
+
 app.use(express.json());
 app.use(cors())
 const prepareResult = (error, data, msg) => {
@@ -23,7 +26,13 @@ app.post("/login", async (req, resp) => {
     if (req.body.password && req.body.email) {
         let user = await User.findOne(req.body).select("-password");
         if (user) {
-            resp.send(user)
+            Jwt.sign({ user }, jwtKey, { expiresIn: "2h" }, (err, token) => {
+                if (err) {
+                    resp.send({ result: "something went wrong, please try after somr time" })
+                }
+                resp.send({ user, auth: token })
+            })
+
         } else {
             resp.send({ result: "No User Found" })
         }
@@ -87,13 +96,13 @@ app.put("/product/:id", async (req, resp) => {
     }
 });
 
-app.get("/search/:key",async (req,resp) => {
+app.get("/search/:key", async (req, resp) => {
     let result = await Product.find({
-        "$or":[
-            {name:{$regex:req.params.key}},
-            {company:{$regex:req.params.key}},
-            {price:{$regex:req.params.key}},
-            {category:{$regex:req.params.key}}
+        "$or": [
+            { name: { $regex: req.params.key } },
+            { company: { $regex: req.params.key } },
+            { price: { $regex: req.params.key } },
+            { category: { $regex: req.params.key } }
         ]
     });
     resp.send(result);
