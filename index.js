@@ -65,7 +65,7 @@ app.delete("/product/:id", async (req, resp) => {
 
 app.get("/product/:id", async (req, resp) => {
     try {
-        const info = await Product.findById(req.params?.id);
+        const info = await Product.findById({_id:req.params?.id});
         if (info) {
             return resp.status(200).json(prepareResult(false, info));
         }
