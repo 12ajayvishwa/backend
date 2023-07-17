@@ -53,17 +53,15 @@ app.delete("/product/:id", async (req, resp) => {
     resp.send(result);
 });
 
-// app.get("/product/:id", async (req, resp) => {
-//     try {
-//         let result = await Product.findById({ _id: req.params.id });
-//        resp.send(result);
-//     } catch (e) {
-//         resp.send(e)
-//         console.log(e);
-//     }
-
-
-// });
+app.get("/product/:id", async (req, resp) => {
+    try {
+        let result = await Product.findById({ _id: req.params.id });
+        resp.send(result);
+    } catch (e) {
+        resp.send(e)
+        console.log(e);
+    }
+});
 
 app.get("/product/:id", async (req, resp) => {
     try {
