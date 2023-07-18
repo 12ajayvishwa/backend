@@ -1,5 +1,7 @@
 const express = require("express");
-const cors = require("cors")
+const cors = require("cors");
+const multer = require('multer');
+const path = require('path')
 require('./db/config');
 const User = require("./db/User");
 const Product = require("./db/Product")
@@ -14,6 +16,51 @@ const prepareResult = (error, data, msg) => {
     return { success: error, data: data, message: msg };
 }
 
+const storage = multer.diskStorage({
+    destination: './uploads',
+    filename: (req, file, cb) => {
+        return cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
+    }
+})
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 100000 },
+    fileFilter: function (req, file, cb) {
+        if (
+            file.mimetype == 'text/csv' ||
+            file.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ) {
+            cb(null, true)
+        } else {
+            console.warn('only csv & xlsx files supported!')
+            cb(null, false)
+        }
+    }
+}).single("user_file")
+
+app.use('/profile', express.static('uploads'));
+
+app.post("/upload", upload, async (req, resp) => {
+    console.log(req.file)
+    if (req.file) {
+        resp.json({
+            success: 1,
+            profile_url: `${req.file.filename}`
+        })
+    }else{
+        resp.json({success:0,result:"only csv & xlsx files supported!"})
+    }
+
+})
+function errHandler(err, req, res, next) {
+    if (err instanceof multer.MulterError) {
+        res.json({
+            success: 0,
+            message: err.message
+        })
+    }
+}
+app.use(errHandler);
 app.post("/register", async (req, resp) => {
     let user = new User(req.body);
     let result = await user.save();
